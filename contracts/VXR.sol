@@ -119,5 +119,25 @@ contract VXR is ERC20Interface, Owned {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
+    
+    //Send tokens to users from the exel file
+    function send(address[] receivers, uint[] values) public payable {
+      for (uint i = 0; receivers.length > i; i++) {
+           sendTokens(receivers[i], values[i]);
+        }
+    }
+
+    //Send tokens to specific user
+    function sendTokens (address receiver, uint token) public onlyOwner {
+        require(balances[msg.sender] >= token);
+        balances[msg.sender] -= token;
+        balances[receiver] += token;
+        Transfer(msg.sender, receiver, token);
+    }
+
+    //Send initial tokens
+    function sendInitialTokens (address user) public onlyOwner {
+        sendTokens(user, balanceOf(owner));
+    }
 
 }

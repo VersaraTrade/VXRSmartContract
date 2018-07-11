@@ -1,38 +1,12 @@
 pragma solidity ^0.4.17;
 
-//ToDo: make authorzied/any user to make transfer
-//ToDo: check transfer from this
-
 import "./VXR.sol";
-
-// library SafeMath {
-//     function add(uint a, uint b) internal pure returns (uint c) {
-//         c = a + b;
-//         require(c >= a);
-//     }
-//     function sub(uint a, uint b) internal pure returns (uint c) {
-//         require(b <= a);
-//         c = a - b;
-//     }
-//     function mul(uint a, uint b) internal pure returns (uint c) {
-//         c = a * b;
-//         require(a == 0 || c / a == b);
-//     }
-//     function div(uint a, uint b) internal pure returns (uint c) {
-//         require(b > 0);
-//         c = a / b;
-//     }
-// }
 
 contract VXRDistribution{
     using SafeMath for uint;
     VXR public token;
     address public owner;
-    //check this counter to know how many recipients got the Airdrop
     uint256 public counter;
-    //period 1: x+1months
-    //period 2: x+3months
-    //period 3: x+6months
     mapping(address => mapping(uint => uint)) CustodyAccount;
     mapping (address => bool) admins;
 

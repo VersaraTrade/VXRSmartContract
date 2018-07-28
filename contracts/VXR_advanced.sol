@@ -97,6 +97,13 @@ contract VTest2 is ERC20Interface, Pausable {
     string public symbol;
     string public  name;
     uint8 public decimals;
+    uint public icoEndTime;
+    uint public waitPeriod;
+    uint public unlockDate1;
+    uint public unlockDate2;
+    uint public unlockDate3;
+    uint public Day = 24*60*60;
+
     uint private _totalSupply;
     mapping(address => uint) balances;
     mapping(address => uint) lockInfo;
@@ -118,6 +125,11 @@ contract VTest2 is ERC20Interface, Pausable {
         decimals = 18;
         _totalSupply = 1000000000*10**uint(decimals);
         balances[owner] = _totalSupply;
+        icoEndTime = 1533870000;
+        waitPeriod = 15;
+        unlockDate1 = icoEndTime + waitPeriod*Day;
+        unlockDate2 = unlockDate1 + 3*30*Day; //add 3 months
+        unlockDate3 = unlockDate2 + 3*30*Day; //add another 3 months
         emit Transfer(address(0), owner, _totalSupply);
     }
 
@@ -172,7 +184,7 @@ contract VTest2 is ERC20Interface, Pausable {
         emit FrozenFunds(target, lockedToken);
     }
 
-    //Batch lock 0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db or lock 0 to release all
+    //Batch lock or lock 0 to release all
     function batchLock(address[] accounts, uint lockedToken) public whenNotPaused onlyAdmin {
       for (uint i = 0; i < accounts.length; i++) {
            lock(accounts[i], lockedToken);

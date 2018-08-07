@@ -125,8 +125,8 @@ contract VTest2 is ERC20Interface, Pausable {
         decimals = 18;
         _totalSupply = 1000000000*10**uint(decimals);
         balances[owner] = _totalSupply;
-        icoEndTime = 1533870000;
-        waitPeriod = 15;
+        icoEndTime = 1533870000; //20180810
+        waitPeriod = 15;//15 days
         unlockDate1 = icoEndTime + waitPeriod*Day;
         unlockDate2 = unlockDate1 + 3*30*Day; //add 3 months
         unlockDate3 = unlockDate2 + 3*30*Day; //add another 3 months

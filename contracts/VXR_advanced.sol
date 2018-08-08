@@ -1,4 +1,4 @@
-pragma solidity ^0.4.22;
+pragma solidity 0.4.22;
 
 library SafeMath {
     function add(uint a, uint b) internal pure returns (uint c) {
@@ -20,9 +20,9 @@ library SafeMath {
 }
 
 contract ERC20Interface {
-    function totalSupply() public constant returns (uint);
-    function balanceOf(address tokenOwner) public constant returns (uint balance);
-    function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
+    function totalSupply() public view returns (uint);
+    function balanceOf(address tokenOwner) public view returns (uint balance);
+    function allowance(address tokenOwner, address spender) public view returns (uint remaining);
     function transfer(address to, uint tokens) public returns (bool success);
     function approve(address spender, uint tokens) public returns (bool success);
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
@@ -92,7 +92,7 @@ contract Pausable is Owned {
   }
 }
 
-contract VTest2 is ERC20Interface, Pausable {
+contract VXR is ERC20Interface, Pausable {
     using SafeMath for uint;
     string public symbol;
     string public  name;
@@ -104,11 +104,11 @@ contract VTest2 is ERC20Interface, Pausable {
     uint public unlockDate3;
     uint public Day = 24*60*60;
 
-    uint private _totalSupply;
-    mapping(address => uint) balances;
-    mapping(address => uint) lockInfo;
-    mapping(address => mapping(address => uint)) allowed;
-    mapping (address => bool) admins;
+    uint public _totalSupply;
+    mapping(address => uint) public balances;
+    mapping(address => uint) public lockInfo;
+    mapping(address => mapping(address => uint)) internal allowed;
+    mapping (address => bool) public admins;
     
     modifier onlyAdmin {
         require(msg.sender == owner || admins[msg.sender]);
@@ -125,19 +125,14 @@ contract VTest2 is ERC20Interface, Pausable {
         decimals = 18;
         _totalSupply = 1000000000*10**uint(decimals);
         balances[owner] = _totalSupply;
-        icoEndTime = 1533870000; //20180810
-        waitPeriod = 15;//15 days
-        unlockDate1 = icoEndTime + waitPeriod*Day;
-        unlockDate2 = unlockDate1 + 3*30*Day; //add 3 months
-        unlockDate3 = unlockDate2 + 3*30*Day; //add another 3 months
         emit Transfer(address(0), owner, _totalSupply);
     }
 
-    function totalSupply() public constant returns (uint) {
-        return _totalSupply  - balances[address(0)];
+    function totalSupply() public view returns (uint) {
+        return _totalSupply;
     }
 
-    function balanceOf(address tokenOwner) public constant returns (uint balance) {
+    function balanceOf(address tokenOwner) public view returns (uint balance) {
         return balances[tokenOwner];
     }
 
@@ -156,25 +151,42 @@ contract VTest2 is ERC20Interface, Pausable {
          return true;
     }
 
-    function approve(address spender, uint tokens) public whenNotPaused returns (bool success) {
-        allowed[msg.sender][spender] = tokens;
-        emit Approval(msg.sender, spender, tokens);
+    function approve(address _spender, uint tokens) public whenNotPaused returns (bool success) {
+        allowed[msg.sender][_spender] = tokens;
+        emit Approval(msg.sender, _spender, tokens);
+        return true;
+    }
+
+    function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
+        allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        return true;
+    }
+
+    function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
+        uint oldValue = allowed[msg.sender][_spender];
+        if (_subtractedValue > oldValue) {
+            allowed[msg.sender][_spender] = 0;
+        } else {
+            allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
+        }
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
     function transferFrom(address from, address to, uint tokens) public whenNotPaused returns (bool success) {
         require(allowed[from][msg.sender] >= tokens);
-        allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         _transfer(from, to, tokens);
+        allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         return true;
     }
 
-    function allowance(address tokenOwner, address spender) public whenNotPaused constant returns (uint remaining) {
+    function allowance(address tokenOwner, address spender) public whenNotPaused view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
     
     //Admin Tool
-    function lockOf(address tokenOwner) public constant returns (uint lockedToken) {
+    function lockOf(address tokenOwner) public view returns (uint lockedToken) {
         return lockInfo[tokenOwner];
     }
 

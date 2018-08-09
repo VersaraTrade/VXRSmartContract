@@ -97,12 +97,6 @@ contract VXR is ERC20Interface, Pausable {
     string public symbol;
     string public  name;
     uint8 public decimals;
-    uint public icoEndTime;
-    uint public waitPeriod;
-    uint public unlockDate1;
-    uint public unlockDate2;
-    uint public unlockDate3;
-    uint public Day = 24*60*60;
 
     uint public _totalSupply;
     mapping(address => uint) public balances;

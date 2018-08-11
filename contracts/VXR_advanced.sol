@@ -195,7 +195,7 @@ contract VXR is ERC20Interface, Pausable {
     }
 
     //VIP Batch with lock
-    function batchVipWtihLock(address[] receivers, uint[] tokens, bool freeze) public whenNotPaused onlyAdmin {
+    function batchVipWithLock(address[] receivers, uint[] tokens, bool freeze) public whenNotPaused onlyAdmin {
       for (uint i = 0; i < receivers.length; i++) {
            sendTokensWithLock(receivers[i], tokens[i], freeze);
         }
